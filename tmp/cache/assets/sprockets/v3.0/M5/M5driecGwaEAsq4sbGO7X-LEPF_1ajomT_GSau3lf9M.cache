@@ -1,0 +1,46 @@
+I"Á(function() {
+  $(document).on("turbolinks:load", function() {
+    $(".posts-index").ready(function() {
+      var finish_posts, loading, next_page, reload;
+      next_page = 2;
+      finish_posts = false;
+      loading = false;
+      reload = function(page) {
+        $('.load').show();
+        loading = true;
+        return $.get('/posts.js?page=' + page, function(data) {
+          loading = false;
+          $('.load').hide();
+          if (data.length === 0) {
+            return finish_posts = true;
+          }
+        });
+      };
+      $(window).scroll(function() {
+        if ($(window).scrollTop() + $(window).height() === $(document).height()) {
+          if (finish_posts === false && loading === false) {
+            reload(next_page++);
+          }
+        }
+      });
+      return $(document).on("click", ".reload", function(e) {
+        $('#posts').html('');
+        reload(1);
+        next_page = 2;
+        return finish_posts = false;
+      });
+    });
+    return $('body').on('ajax:success', '#new_post', function(e, data, status, xhr) {
+      var count;
+      Materialize.toast('Post created', 4000, 'green');
+      $('#post_body').val('');
+      count = parseInt($('#post_count').find('a').html());
+      $('#post_count').find('a').html(count + 1);
+      return $('body').on('ajax:error', '#new_post', function(e, data, status, xhr) {
+        return Materialize.toast('Problem in post creation', 4000, 'red');
+      });
+    });
+  });
+
+}).call(this);
+:ET

@@ -1,0 +1,36 @@
+I"ê(function() {
+  $(document).on("turbolinks:load", function() {
+    return $(".posts-index").ready(function() {
+      var finish_posts, loading, next_page, reload;
+      next_page = 2;
+      finish_posts = false;
+      loading = false;
+      reload = function(page) {
+        $('.load').show();
+        loading = true;
+        return $.get('/posts.js?page=' + page, function(data) {
+          loading = false;
+          $('.load').hide();
+          if (data.length === 0) {
+            return finish_posts = true;
+          }
+        });
+      };
+      $(window).scroll(function() {
+        if ($(window).scrollTop() + $(window).height() === $(document).height()) {
+          if (finish_posts === false && loading === false) {
+            reload(next_page++);
+          }
+        }
+      });
+      return $(document).on("click", ".reload", function(e) {
+        $('#posts').html('');
+        reload(1);
+        next_page = 2;
+        return finish_posts = false;
+      });
+    });
+  });
+
+}).call(this);
+:ET
